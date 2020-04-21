@@ -1,8 +1,13 @@
 {
-  "name": "tfjs-models",
+  "name": "posenet",
   "version": "0.0.1",
-  "description": "",
+  "author": "Hugo Zanini",
+  "description": "Activities-Pose-Estimation",
   "main": "index.js",
+  "homepage": "https://github.com/hugozanini/Activities-Pose-Estimation#readme",
+  "bugs": {
+    "url": "https://github.com/hugozanini/Activities-Pose-Estimation/issues"
+  },
   "license": "Apache-2.0",
   "private": true,
   "engines": {
@@ -18,7 +23,8 @@
     "build": "cross-env NODE_ENV=production parcel build index.html --public-url ./",
     "build-camera": "cross-env NODE_ENV=production parcel build camera.html --public-url ./",
     "lint": "eslint .",
-    "link-local": "yalc link"
+    "link-local": "yalc link",
+    "start": "cross-env NODE_ENV=development parcel index.html --no-hmr --open "
   },
   "browser": {
     "crypto": false
