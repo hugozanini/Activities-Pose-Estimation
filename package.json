@@ -24,7 +24,7 @@
     "build-camera": "cross-env NODE_ENV=production parcel build camera.html --public-url ./",
     "lint": "eslint .",
     "link-local": "yalc link",
-    "start": "cross-env NODE_ENV=production parcel index.html --public-url ./ "
+    "start": "cross-env NODE_ENV=development parcel index.html --no-hmr --open "
   },
   "browser": {
     "crypto": false
