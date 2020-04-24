@@ -114,6 +114,40 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
 /**
  * Draw pose keypoints onto a canvas
  */
+
+export function jumping_jack_calc(keypoints, minConfidence, ctx, wko_started){
+  const right_ident = keypoints[10].score > minConfidence && keypoints[14].score > minConfidence && keypoints[16].score > minConfidence;
+  const left_ident = keypoints[9].score > minConfidence && keypoints[13].score > minConfidence && keypoints[15].score > minConfidence;
+
+  if (right_ident && left_ident && wko_started == 1) {
+    const wrist_diff = Math.abs(keypoints[10].position.x - keypoints[9].position.x);
+    console.log('wrist_diff: ', wrist_diff);
+    const knee_diff = Math.abs(keypoints[14].position.x - keypoints[13].position.x);
+    console.log('knee_diff: ', knee_diff);
+    const ankle_diff = Math.abs(keypoints[16].position.x - keypoints[15].position.x)
+    console.log('ankle_diff: ', ankle_diff);
+
+    const sum = wrist_diff + ankle_diff;
+    console.log('sum: ', sum);
+    if (sum <= 55){
+      if (prev == 0){
+        prev = -1;
+        return 0;
+      }
+      else if (prev == 1){
+        prev = -1;
+        return 1;
+      }
+    }
+    else if (prev == -1){
+      prev = 1;
+      return 1;
+    }
+    
+  }
+  return 0;
+}
+
 export function weight_lifting_calc(keypoints, minConfidence, ctx, wko_started){
 
   const right_ident = keypoints[8].score > minConfidence && keypoints[8].score > minConfidence
@@ -128,11 +162,11 @@ export function weight_lifting_calc(keypoints, minConfidence, ctx, wko_started){
       const delta_ly = keypoints[9].position.y - keypoints[7].position.y;
       const left_teta = Math.atan2(delta_ly, delta_lx) * 180 / Math.PI;
   
-      console.log(right_teta);
+      //console.log(right_teta);
       
       if (right_teta > 0){
         ctx.font = "25px Arial";
-        ctx.fillStyle = "red";
+        //ctx.fillStyle = "red";
         ctx.fillText('Down', 10, 50,);
         if (prev == 0){
           prev = -1;
@@ -145,7 +179,7 @@ export function weight_lifting_calc(keypoints, minConfidence, ctx, wko_started){
       }
       else if(right_teta  < 0){
         ctx.font = "25px Arial";
-        ctx.fillStyle = "green";
+        //ctx.fillStyle = "green";
         ctx.fillText('Up', 10, 50,);
         if (prev == 0){
           prev = 1;
@@ -157,13 +191,16 @@ export function weight_lifting_calc(keypoints, minConfidence, ctx, wko_started){
         }
       }
     }
-  return 0
+  return 0;
 }
+
+
 export function global_zero(){
   prev = 0;
 }
-export function drawKeypoints(keypoints, minConfidence, ctx, repetitions, wko_started, scale = 1) {
-  console.log(repetitions);
+export function drawKeypoints(keypoints, minConfidence, ctx, 
+  repetitions, wko_started, activity, scale = 1) {
+  //console.log(repetitions);
   
   
   for (let i = 0; i < keypoints.length; i++) {
@@ -178,8 +215,17 @@ export function drawKeypoints(keypoints, minConfidence, ctx, repetitions, wko_st
     
     //console.log(keypoint);
   }
-
-  return weight_lifting_calc(keypoints, minConfidence, ctx, wko_started)
+  console.log(activity)
+  if (activity == 'Weight Lifting'){
+    return weight_lifting_calc(keypoints, minConfidence, ctx, wko_started)
+  }
+  else if (activity == 'Jumping jack'){
+    return jumping_jack_calc(keypoints, minConfidence, ctx, wko_started);
+  }
+  else{
+    return 0
+  }
+  
 }
 
 /**

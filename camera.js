@@ -24,8 +24,12 @@ const videoWidth = 600;
 const videoHeight = 500;
 var rep_count = 0;
 var wko_started = 0;
-var done = 0
+var done = 0;
+var timer = 0;
 var t0 = 0;
+var count_down = 0;
+var act_dur = 0;
+var last_rep = 0;
 const stats = new Stats();
 
 /**
@@ -85,7 +89,7 @@ const guiState = {
   activity: {
     Activity: 'Weight Lifting',
     Repetitions: 10,
-    Duration_min: 2
+    Duration_min: 60
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
@@ -142,10 +146,11 @@ function setupGui(cameras, net) {
       activity.add(guiState.activity, 'Activity', ['Weight Lifting', 'Jumping jack']);
   guiState.atividade = guiState.activity.activity;
   activity.add(guiState.activity, 'Repetitions', 0, 50);
-  activity.add(guiState.activity, 'Duration_min', 0, 5).name('Duration (min)');
+  activity.add(guiState.activity, 'Duration_min', 0, 180).name('Duration (sec)');
   var obj = { add:function(){ 
-    console.log("clicked");
+    console.log("clicked");  
     rep_count = 0;
+    count_down = 0;
     wko_started = 1
     done = 0
     global_zero();
@@ -345,22 +350,69 @@ function detectPoseInRealTime(video, net) {
       if (score >= minPoseConfidence) {
         if (guiState.output.showPoints) {
           //console.log(guiState.activity.Repetitions);
-          console.log(rep_count);
-          rep_count = rep_count + drawKeypoints(keypoints, minPartConfidence, ctx, rep_count, wko_started);
-          
+          console.log('Repetitions: ', rep_count);
+          rep_count = rep_count + drawKeypoints(keypoints, minPartConfidence, ctx, 
+            rep_count, wko_started, guiState.activity.Activity);
+
           if (wko_started == 1 && done == 0){
             ctx.font = "25px Arial"; 
             ctx.fillText('Repetitions: ' + Math.round(rep_count/2), 10, 90,);
-            if (Math.round(rep_count/2) == guiState.activity.Repetitions){
-              done = 1
+            ctx.fillText(guiState.activity.Activity + ' workout has started', 100, 490,);
+            if (timer == 0){
+              if (count_down == 0){
+                t0 = new Date() / 1000;
+                count_down = 1;
+              }
+              
+              ctx.font = "100px Arial"; 
+              var now = new Date() / 1000;
+              if (now - t0 <= 5){
+                ctx.fillText(5 - Math.round(now - t0), 250, 250,);
+                now = new Date() / 1000;
+              }
+              else{
+                timer = 1;
+                t0 = new Date() / 1000;
+                rep_count = 0;
+              }
+              
+            }
+            else{
+              act_dur = Math.round(new Date() / 1000 - t0)
+              // console.log(new Date() / 1000)
+              console.log("Actual duration: ", act_dur);
+              console.log("guiState duration: ", guiState.activity.Duration_min);
+              console.log("Equal? ", act_dur == guiState.activity.Duration_min);
+              
+              ctx.fillText('Duration: ' + act_dur + 's', 430, 90,);
+              
+              if (guiState.activity.Activity == 'Weight Lifting' && Math.round(rep_count/2) == guiState.activity.Repetitions){
+                done = 1
+              }
+              else if (guiState.activity.Activity == 'Jumping jack' && act_dur == guiState.activity.Duration_min){
+                done = 1
+              }
             }
           }
           else if(done == 1) {
+            if (wko_started == 1){
+              last_rep = rep_count;
+            }
             wko_started = 0;
-            rep_count = 0;
-            global_zero();
             ctx.font = "45px Arial"; 
-            ctx.fillText('DONE!!', 90, 90,);
+            ctx.fillStyle = "green";
+            ctx.fillText('DONE!!', 210, 250,);
+            if (guiState.activity.Activity == 'Weight Lifting'){
+              ctx.fillText('Duration: ' + act_dur + 's', 160, 300,);
+              rep_count = 0;
+              global_zero();
+            }
+            else if (guiState.activity.Activity == 'Jumping jack'){
+              ctx.fillText('Repetitions: ' + Math.round(last_rep/2), 160, 300,);
+              rep_count = 0;
+              global_zero();
+            }
+            timer = 0;
           }
           else if (rep_count != guiState.activity.Repetitions || done == 0){
             wko_started = 0;
