@@ -1,4 +1,4 @@
-# In broswer workout performance measurement using Pose Estimation
+# In browser workout performance measurement using Pose Estimation
 
 The goal of this repo is to use pose estimation information to measure workouts.
 
