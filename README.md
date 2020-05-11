@@ -6,7 +6,7 @@ The goal of this repo is to use pose estimation information to measure workouts.
 
 It was used an implementation of PoseNet in TensorFlow.js and this project is based on examples from the [TensorFlow Js models](https://github.com/tensorflow/tfjs-models). 
 	
-An article, explaining the used libraries and techiniques is available here [put link].
+An article, explaining the used libraries and techiniques is available [here](https://medium.com/data-hackers/pose-estimation-no-browser-utilizando-tensorflow-js-para-medir-seus-exerc%C3%ADcios-f%C3%ADsicos-b3a827240481).
 
 # Todo
 
